@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Kompleksitas Algoritma — Pertemuan 1–6</title>
+    <style>
+      :root {
+        --bg: #fafaf7;
+        --fg: #1c2330;
+        --mut: #5b6472;
+        --card: #fff;
+        --bd: #d9dce3;
+        --ac: #1f5fbf;
+        --def: #e8f0fd;
+        --rum: #fff6dd;
+        --ex: #eaf7ee;
+        --warn: #fdecec;
+        --ok: #1b7f3b;
+        --bad: #b3261e;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #141820;
+          --fg: #e6e9ef;
+          --mut: #9aa3b2;
+          --card: #1b212c;
+          --bd: #333c4b;
+          --ac: #7fb0ff;
+          --def: #1d2b45;
+          --rum: #3a3220;
+          --ex: #1b3325;
+          --warn: #3a2020;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 16px/1.65 system-ui, Segoe UI, sans-serif;
+      }
+      header,
+      main {
+        max-width: 900px;
+        margin: auto;
+        padding: 0 16px;
+      }
+      h1 {
+        font-size: 1.7rem;
+        margin: 24px 0 4px;
+      }
+      h2 {
+        font-size: 1.35rem;
+        border-bottom: 2px solid var(--ac);
+        padding-bottom: 4px;
+        margin-top: 40px;
+      }
+      h3 {
+        font-size: 1.05rem;
+        margin: 18px 0 6px;
+        color: var(--ac);
+      }
+      nav {
+        position: sticky;
+        top: 0;
+        background: var(--card);
+        border-bottom: 1px solid var(--bd);
+        z-index: 9;
+        padding: 6px 8px;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      nav a,
+      .chip,
+      button {
+        font: inherit;
+        font-size: 0.9rem;
+        padding: 4px 10px;
+        border: 1px solid var(--bd);
+        border-radius: 6px;
+        background: var(--card);
+        color: var(--ac);
+        text-decoration: none;
+        cursor: pointer;
+      }
+      button.on,
+      .chip.on {
+        background: var(--ac);
+        color: #fff;
+      }
+      button:hover {
+        border-color: var(--ac);
+      }
+      .box {
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin: 10px 0;
+        border-left: 5px solid;
+      }
+      .def {
+        background: var(--def);
+        border-color: #3b7be0;
+      }
+      .rum {
+        background: var(--rum);
+        border-color: #d4a017;
+      }
+      .ex {
+        background: var(--ex);
+        border-color: #2e9e57;
+      }
+      .warn {
+        background: var(--warn);
+        border-color: #d64545;
+      }
+      .note {
+        background: var(--card);
+        border: 1px dashed var(--mut);
+      }
+      .box b.t {
+        display: block;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--mut);
+      }
+      .map {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        margin: 12px 0;
+      }
+      .map span.n {
+        background: var(--def);
+        border: 1px solid var(--bd);
+        border-radius: 8px;
+        padding: 6px 10px;
+      }
+      pre {
+        background: var(--card);
+        border: 1px solid var(--bd);
+        padding: 10px;
+        overflow-x: auto;
+        border-radius: 6px;
+        font-size: 0.88rem;
+      }
+      .m {
+        font-family: Cambria, "Times New Roman", serif;
+        font-size: 1.08em;
+      }
+      .fr {
+        display: inline-flex;
+        flex-direction: column;
+        vertical-align: middle;
+        text-align: center;
+        margin: 0 2px;
+        line-height: 1.2;
+      }
+      .fr > span:first-child {
+        border-bottom: 1.5px solid currentColor;
+        padding: 0 3px;
+      }
+      .fr > span:last-child {
+        padding: 0 3px;
+      }
+      .w {
+        overflow-x: auto;
+        max-width: 100%;
+      }
+      table {
+        border-collapse: collapse;
+        min-width: 100%;
+      }
+      td,
+      th {
+        border: 1px solid var(--bd);
+        padding: 4px 8px;
+        text-align: left;
+      }
+      .q {
+        background: var(--card);
+        border: 1px solid var(--bd);
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin: 12px 0;
+      }
+      .q.done {
+        border-left: 5px solid var(--ok);
+      }
+      .q label {
+        display: block;
+        padding: 3px 0;
+        cursor: pointer;
+      }
+      .tag {
+        font-size: 0.75rem;
+        color: var(--mut);
+      }
+      .res {
+        margin-top: 8px;
+      }
+      .good {
+        color: var(--ok);
+        font-weight: 600;
+      }
+      .bad {
+        color: var(--bad);
+        font-weight: 600;
+      }
+      .sol {
+        display: none;
+        margin-top: 8px;
+      }
+      .sol.show {
+        display: block;
+      }
+      #score {
+        position: sticky;
+        bottom: 0;
+        background: var(--card);
+        border-top: 1px solid var(--bd);
+        padding: 6px;
+        text-align: center;
+      }
+      @media (max-width: 600px) {
+        body {
+          font-size: 15px;
+        }
+      }
+      @media print {
+        nav,
+        #lat,
+        #score,
+        button,
+        .noprint {
+          display: none !important;
+        }
+        body {
+          background: #fff;
+          color: #000;
+        }
+        .box {
+          break-inside: avoid;
+        }
+        h2 {
+          break-before: page;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="nav">
+      <a href="#awal">Awal</a><a href="#p1">P1</a><a href="#p2">P2</a
+      ><a href="#p3">P3</a><a href="#p4">P4</a><a href="#p5">P5</a
+      ><a href="#p6">P6</a><a href="#lat">Latihan</a
+      ><a href="#" onclick="window.print();return false">Cetak</a>
+    </nav>
+    <header id="awal">
+      <h1>Kompleksitas Algoritma — Pertemuan 1–6</h1>
+      <p>
+        Modul belajar mandiri berdasarkan Materi 1–6 dosen. Urutannya:
+        <b>cheatsheet semua pertemuan dulu</b>, baru latihan di bagian paling
+        bawah.
+      </p>
+      <div class="box note">
+        <b class="t">Cara memakai</b>Baca cheatsheet berurutan. Di setiap
+        pertemuan, coba hitung sendiri contoh sebelum membaca langkahnya. Di
+        bagian Latihan, pilihan ganda diperiksa dengan tombol <i>Periksa</i>;
+        soal hitungan dan uraian punya tombol <i>Lihat pembahasan</i>. Progres
+        tersimpan di browser (localStorage). Tombol Cetak menyembunyikan
+        latihan.
+      </div>
+      <h3>Peta materi</h3>
+      <div class="map">
+        <span class="n">1 Dasar algoritma</span>→<span class="n"
+          >2 Menghitung operasi</span
+        >→<span class="n">3 Notasi asimtotik</span>→<span class="n"
+          >4 Rekursi &amp; rekurensi</span
+        >→<span class="n">5 Divide &amp; Conquer</span>→<span class="n"
+          >6 Greedy</span
+        >
+      </div>
+      <p class="tag">
+        Alasan urutannya: pertemuan 2 memberi cara menghitung T(n); pertemuan 3
+        menyederhanakannya jadi Big-O; pertemuan 4 memberi alat untuk T(n) yang
+        rekursif; pertemuan 5 dan 6 memakai semua alat itu untuk menganalisis
+        strategi desain algoritma.
+      </p>
+      <div class="box note">
+        <b class="t">Catatan jujur tentang sumber</b>Semua slide terbaca. Rumus
+        pada slide berupa gambar (mis. pembuktian induksi Materi 1,
+        langkah-langkah Materi 3) saya rekonstruksi dari teks di sekitarnya dan
+        dicek ulang secara matematis. Slide gambar seperti ilustrasi pohon tidak
+        saya salin persis, jadi cocokkan dengan slide asli bila perlu.
+      </div>
+    </header>
+    <main id="cs"></main>
+    <main id="lat">
+      <h2>Latihan (setelah semua cheatsheet)</h2>
+      <p><span class="tag">Filter:</span> <span id="flt"></span></p>
+      <div id="qs"></div>
+    </main>
+    <div id="score"></div>
+    <script>
+      // ---- mini-markup: _[sub] ^[sup] {atas|bawah}
+      function M(s) {
+        for (let i = 0; i < 3; i++) {
+          s = s
+            .replace(/_\[([^\[\]]*)\]/g, "<sub>$1</sub>")
+            .replace(/\^\[([^\[\]]*)\]/g, "<sup>$1</sup>")
+            .replace(
+              /\{([^{}|]+)\|([^{}]+)\}/g,
+              '<span class="fr"><span>$1</span><span>$2</span></span>'
+            );
+        }
+        return s;
+      }
+      const B = (c, t, x) =>
+        `<div class="box ${c}"><b class="t">${t}</b>${M(x)}</div>`;
+      const P = [
+        {
+          n: 1,
+          t: "Dasar Algoritma, Efisiensi, dan Induksi",
+          tujuan:
+            "Memahami apa itu algoritma, mengapa efisiensi penting, dan cara membuktikan algoritma benar dengan induksi matematika.",
+          istilah: [
+            [
+              "Algoritma",
+              "Urutan langkah logis dan sistematis untuk menyelesaikan masalah. Didefinisikan lewat <b>masalah</b>, <b>masukan</b>, dan <b>keluaran</b>.",
+            ],
+            [
+              "Program",
+              "Realisasi algoritma dalam bahasa pemrograman: program = algoritma + bahasa.",
+            ],
+            [
+              "Algoritma benar",
+              "Untuk setiap masukan valid menghasilkan keluaran benar <b>dan pasti berhenti</b> (terminasi).",
+            ],
+            [
+              "Base case / langkah induksi",
+              "Base case: bukti untuk nilai awal. Langkah induksi: jika P(k) benar maka P(k+1) benar.",
+            ],
+          ],
+          rumus: [
+            "1 + 2 + … + n = {n(n+1)|2}",
+            "Insertion sort: c_[1]n^[2] &nbsp; Merge sort: c_[2] n lg n &nbsp; (lg = log_[2], c = konstanta)",
+          ],
+          intuisi:
+            "n² tumbuh jauh lebih cepat daripada n lg n. Konstanta c hanya menggeser titik potong, sehingga untuk n cukup besar merge sort selalu menang meski c₂ &gt; c₁. Untuk n = 1.000, lg n ≈ 10; untuk n = 1 juta, lg n ≈ 20.",
+          contoh: [
+            [
+              "Komputer A (insertion sort, 2n², 10 miliar instruksi/detik) vs B (merge sort, 50 n lg n, 10 juta instruksi/detik), n = 10^[7]",
+              "A: {2·(10^[7])^[2]|10^[10]} = {2·10^[14]|10^[10]} = 20.000 detik ≈ 5,6 jam.<br>B: lg 10^[7] = 7·3,3219 ≈ 23,25, maka {50·10^[7]·23,25|10^[7]} ≈ 1.163 detik ≈ 19 menit. B menang walau mesinnya 1000× lebih lambat.",
+            ],
+            [
+              "Induksi: buktikan 1+2+…+n = n(n+1)/2 untuk n ≥ 1",
+              "Base case P(1): ruas kiri 1; ruas kanan {1·2|2} = 1 ✓.<br>Langkah: anggap P(k) benar. Untuk P(k+1): ruas kiri = {k(k+1)|2} + (k+1) = (k+1)({k|2}+1) = {(k+1)(k+2)|2}, sama dengan ruas kanan P(k+1) ✓.",
+            ],
+            [
+              "Induksi: n³ − n habis dibagi 6 untuk n ≥ 2",
+              "P(2) = 8 − 2 = 6, 6 mod 6 = 0 ✓. Langkah: (k+1)³ − (k+1) = (k³ − k) + 3k(k+1). Suku pertama kelipatan 6 (hipotesis). Salah satu dari k atau k+1 genap, jadi 3k(k+1) kelipatan 6 ✓.",
+            ],
+          ],
+          pseudo: null,
+          cara: "Membandingkan dua algoritma: tulis kedua fungsi waktunya, buat pertidaksamaan, cari n. Contoh 8n² &lt; 64 n lg n ⇔ n &lt; 8 lg n. Uji n = 43: 8·lg 43 ≈ 43,4 &gt; 43 ✓; n = 44: 8·lg 44 ≈ 43,7 &lt; 44 ✗. Jadi insertion sort menang untuk 2 ≤ n ≤ 43 (n = 1: lg 1 = 0, merge sort menang).",
+          salah: [
+            "Menganggap algoritma benar hanya karena lolos beberapa tes; tes bukan bukti.",
+            "Lupa membuktikan terminasi.",
+            "Melewatkan base case, atau memakai nilai awal yang salah (mis. n ≥ 2 pada contoh n³ − n).",
+            "Menganggap konstanta kecil selalu menang untuk semua n.",
+          ],
+          ringkas:
+            "Algoritma yang baik itu benar, berhenti, dan efisien. Efisiensi dilihat dari laju pertumbuhan, dan kebenaran dibuktikan (salah satunya dengan induksi).",
+        },
+        {
+          n: 2,
+          t: "Konsep Kompleksitas Waktu",
+          tujuan:
+            "Bisa menghitung berapa kali operasi utama dijalankan sebagai fungsi ukuran input n, dan membedakan kasus terbaik, rata-rata, terburuk.",
+          istilah: [
+            [
+              "Ukuran input (n)",
+              "Besaran yang jika membesar membuat kerja bertambah, mis. banyak elemen larik.",
+            ],
+            [
+              "Operasi dasar (khas)",
+              "Operasi yang paling mewakili kerja utama, mis. perbandingan pada searching, penjumlahan pada penjumlahan elemen.",
+            ],
+            [
+              "T(n)",
+              "Jumlah operasi dasar sebagai fungsi n (bukan detik nyata).",
+            ],
+            [
+              "T_[min], T_[avg], T_[max]",
+              "Waktu minimum (best), rata-rata, dan maksimum (worst) untuk n yang sama.",
+            ],
+            ["S(n)", "Kompleksitas ruang: memori sebagai fungsi n."],
+          ],
+          rumus: [
+            "Rerata array: T(n) = n &nbsp; | &nbsp; Nilai maks: T(n) = n − 1",
+            "Sequential search: T_[min] = 1, T_[max] = n, T_[avg] = {1+2+…+n|n} = {n+1|2}",
+          ],
+          intuisi:
+            "Waktu detik bergantung mesin dan compiler, sehingga tidak adil untuk membandingkan algoritma. Menghitung operasi dasar bersifat independen dari mesin. Saat n besar, konstanta seperti “2” pada 2+y tidak berarti.",
+          contoh: [
+            [
+              "Nilai maksimum pada larik 12 elemen",
+              "maks ← a₁; loop k = 2 sampai 12 membandingkan a_[k] dengan maks. Jumlah perbandingan = 12 − 1 = 11, jadi T(n) = n − 1.",
+            ],
+            [
+              "Sequential search n = 10, x pasti ada dan tiap posisi sama mungkin",
+              "Posisi j butuh j perbandingan. T_[avg] = {1+2+…+10|10} = {55|10} = 5,5 = {10+1|2} ✓. Best: 1, worst: 10.",
+            ],
+            [
+              "Fungsi pangkat(2,5)",
+              "Baris hasil ← x·hasil dijalankan y = 5 kali, ditambah 2 langkah awal/akhir: 2+5 = 7 langkah. Untuk y = 1000 jadi 1002; angka 2 tak berpengaruh, sehingga efisiensi bergantung pada y.",
+            ],
+          ],
+          pseudo:
+            "sum ← 0\nfor i ← 1 to n do\n  sum ← sum + a[i]     // dijalankan n kali\nrata ← sum / n",
+          cara: "(1) tentukan n, (2) pilih operasi dasar, (3) hitung berapa kali operasi itu dijalankan (ada loop: banyak iterasi × isi loop), (4) tulis T(n), (5) tentukan apakah ada perbedaan best/avg/worst.",
+          salah: [
+            "Menghitung detik dan bukan operasi.",
+            "Mengira T_[avg] selalu (T_[min]+T_[max])/2; itu bergantung pada distribusi input. Pada linear search kebetulan sama karena posisi dianggap seragam.",
+            "Mengira selalu ada tiga kasus: pada rerata array dan nilai maks, semua input memberi hasil sama.",
+          ],
+          ringkas:
+            "Hitung operasi dasar sebagai fungsi n. Tentukan kasus terbaik/rata-rata/terburuk bila jumlah operasi bergantung pada isi data.",
+        },
+        {
+          n: 3,
+          t: "Kompleksitas Asimtotik (Big-O, Ω, Θ)",
+          tujuan:
+            "Menyederhanakan T(n) menjadi kelas pertumbuhan dan menentukan Big-O dari T(n) maupun dari pseudocode.",
+          istilah: [
+            [
+              "Big-O",
+              "T(n) = O(f(n)) jika ada C dan n₀ sehingga T(n) ≤ C·f(n) untuk semua n ≥ n₀. Ini <b>batas atas</b>.",
+            ],
+            [
+              "Big-Omega",
+              "T(n) = Ω(g(n)) jika T(n) ≥ C·g(n) untuk n ≥ n₀. Ini <b>batas bawah</b>.",
+            ],
+            [
+              "Big-Theta",
+              "T(n) = Θ(h(n)) jika T(n) = O(h(n)) <b>dan</b> T(n) = Ω(h(n)). Ini batas ketat.",
+            ],
+          ],
+          rumus: [
+            "Urutan pertumbuhan: O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(n^[m]) &lt; O(m^[n]) &lt; O(n!)",
+            "Deret: 1+2+…+n = {n(n+1)|2} = {n^[2]|2} + {n|2} ⇒ Θ(n²)",
+            "Binary search: {n|2^[i]} = 1 ⇒ i = log_[2] n",
+          ],
+          intuisi:
+            "Untuk n besar, suku berpangkat tertinggi mendominasi dan koefisiennya hanya konstanta. Pada 2n² + 6n + 1, bila n = 1.000 suku 2n² = 2.000.000 sedangkan 6n hanya 6.000.",
+          contoh: [
+            [
+              "Buktikan 2n² + 6n + 1 = O(n²)",
+              "Untuk n ≥ 1 berlaku 6n ≤ 6n² dan 1 ≤ n². Maka 2n² + 6n + 1 ≤ 2n² + 6n² + n² = 9n². Pilih C = 9, n₀ = 1 ✓. Cukup satu pasangan (C, n₀).",
+            ],
+            [
+              "Loop bersarang: for i=1..n, for j=1..i, lakukan a←a+1",
+              "Isi dalam dijalankan 1 + 2 + … + n = {n(n+1)|2} kali. Untuk n = 10 itu 55. T(n) = {n²|2}+{n|2}; suku n² dominan, koefisien dibuang ⇒ Θ(n²).",
+            ],
+            [
+              "Binary search",
+              "Tiap iterasi ukuran sisa data dibagi 2. Setelah i iterasi tersisa {n|2^[i]}. Berhenti saat sisa 1: i = log₂ n. Tiap iterasi kerja konstan (±7 langkah) ⇒ O(log n).",
+            ],
+          ],
+          pseudo:
+            "for i ← 1 to n do        // n kali\n  for j ← 1 to i do     // i kali\n    a ← a + 1           // O(1)",
+          cara: "Cara 1: dapatkan T(n), ambil suku dominan, buang koefisien. Cara 2: tiap operasi tunggal O(1); loop = jumlah iterasi × biaya isi; urutan blok dijumlah lalu ambil yang terbesar, O(max(...)). Contoh: O(1) + (n−1)·O(1) + O(1) = O(n).<br><b>Data sudah terurut vs perlu diurutkan:</b> binary search O(log n) mengandaikan larik <i>sudah</i> terurut. Bila belum, mengurutkan dulu butuh O(n log n), jadi untuk satu pencarian linear search O(n) lebih murah. Untuk pasangan berjumlah 0 pada larik terurut: n × binary search = O(n log n).",
+          salah: [
+            "Menyamakan Big-O dengan worst case. Big-O adalah batas atas suatu fungsi; worst case adalah skenario input. Keduanya berbeda, dan Big-O bisa dipakai untuk best, avg, atau worst. (Slide menyederhanakan “O untuk worst case, Ω untuk best case”.)",
+            "Menulis O(n²/2) dan bukan O(n²).",
+            "Mengira O(2n) dan O(n) berbeda. Konstanta dibuang.",
+          ],
+          ringkas:
+            "Big-O = batas atas, Ω = batas bawah, Θ = ketat. Ambil suku dominan, buang koefisien, dan pahami dari mana jumlah iterasi berasal.",
+        },
+        {
+          n: 4,
+          t: "Rekursi dan Persamaan Rekurensi",
+          tujuan:
+            "Menulis dan menganalisis fungsi rekursif: membentuk T(n), menyelesaikannya dengan backward substitution, dan memakai Teorema Master.",
+          istilah: [
+            [
+              "Fungsi rekursif",
+              "Fungsi yang memanggil dirinya sendiri dengan ukuran lebih kecil.",
+            ],
+            [
+              "Base case",
+              "Kasus dasar yang langsung terjawab (mis. 1! = 1). Tanpa ini rekursi tak berhenti.",
+            ],
+            [
+              "Recursive case",
+              "Kasus umum yang dipecah menjadi kasus lebih kecil dan harus makin dekat ke base case.",
+            ],
+            [
+              "Rekurensi",
+              "Persamaan T(n) yang dinyatakan lewat T ukuran lebih kecil.",
+            ],
+            [
+              "Iterasi",
+              "Perulangan dengan for/while; rekursi memakai pemanggilan fungsi.",
+            ],
+          ],
+          rumus: [
+            "Faktorial: T(1) = 0, T(n) = T(n−1) + 1 &nbsp;⇒&nbsp; T(n) = n − 1",
+            "Backward substitution: T(n) = T(n−i) + i, berhenti saat n − i = 1",
+            "<b>Teorema Master:</b> T(n) = a·T({n|b}) + f(n), a ≥ 1, b &gt; 1<br>Kasus 1: f(n) = O(n^[log_[b]a − ε]), ε &gt; 0 ⇒ T(n) = Θ(n^[log_[b]a])<br>Kasus 2: f(n) = Θ(n^[log_[b]a]) ⇒ T(n) = Θ(n^[log_[b]a] log n)<br>Kasus 3: f(n) = Ω(n^[log_[b]a + ε]) <b>dan</b> a·f({n|b}) ≤ c·f(n) untuk c &lt; 1 ⇒ T(n) = Θ(f(n))",
+          ],
+          intuisi:
+            "Master theorem membandingkan kerja di daun pohon rekursi (n^[log_[b]a]) dengan kerja per level (f(n)). Kasus 1: daun dominan; kasus 2: seimbang, ada faktor log n dari banyaknya level; kasus 3: akar dominan.",
+          contoh: [
+            [
+              "Backward substitution faktorial",
+              "T(n) = T(n−1)+1 = T(n−2)+2 = T(n−3)+3 = … = T(n−i)+i. Base T(1) = 0 tercapai saat n − i = 1, yakni i = n − 1. Jadi T(n) = n − 1 = Θ(n). Cek n = 4: 3 perkalian ✓ (4·3·2·1).",
+            ],
+            [
+              "Master: T(n) = 7T({n|2}) + n²",
+              "a = 7, b = 2, f(n) = n², log₂7 ≈ 2,807. Karena n² = O(n^[2,807−ε]): <b>kasus 1</b> ⇒ T(n) = Θ(n^[log_[2]7]).",
+            ],
+            [
+              "Master: T(n) = 4T({n|2}) + n²",
+              "a = 4, b = 2, log₂4 = 2, f(n) = n² = Θ(n²): <b>kasus 2</b> ⇒ Θ(n² log n).",
+            ],
+            [
+              "Master: T(n) = 2T({n|3}) + n³",
+              "a = 2, b = 3, log₃2 ≈ 0,63. f(n) = n³ = Ω(n^[0,63+ε]): kasus 3. Syarat: 2f({n|3}) = {2n³|27} ≤ c·n³ untuk c = {2|27} &lt; 1 ✓ ⇒ Θ(n³).",
+            ],
+            [
+              "Fibonacci: berapa pemanggilan Fib(5)?",
+              "C(n) = C(n−1)+C(n−2)+1, C(0)=C(1)=1: C(2)=3, C(3)=5, C(4)=9, C(5)=15. Nilainya tumbuh eksponensial karena subsoal yang sama dihitung berulang.",
+            ],
+          ],
+          pseudo:
+            "Faktorial(n)\n  if n <= 1: return 1          // base case\n  else: return n * Faktorial(n-1)  // recursive case",
+          cara: "Lima langkah: (1) parameter ukuran, (2) operasi dasar, (3) ada best/avg/worst? (4) tulis rekurensi, (5) selesaikan (backward substitution atau Master). <b>Syarat Master:</b> bentuk harus aT(n/b)+f(n). T(n) = T(n−1)+1 <i>tidak</i> cocok (n dikurangi, bukan dibagi). Ada juga celah antar kasus yang tidak tercakup.",
+          salah: [
+            "Memakai Master untuk T(n) = T(n−1)+1.",
+            "Membandingkan f(n) dengan n^[log_[b]a] tanpa menghitung log_[b]a.",
+            "Lupa cek syarat regularitas pada kasus 3.",
+            "Menulis kasus 2 dengan O; seharusnya Θ (slide memakai O).",
+          ],
+          ringkas:
+            "Rekursi = base case + recursive case yang menuju base case. T(n) dari rekursi diselesaikan dengan backward substitution, atau Master bila bentuknya aT(n/b)+f(n).",
+        },
+        {
+          n: 5,
+          t: "Divide and Conquer",
+          tujuan:
+            "Mengenali pola bagi-selesaikan-gabungkan, membentuk rekurensinya, dan menganalisis algoritma klasik.",
+          istilah: [
+            ["Divide", "Membagi masalah menjadi submasalah lebih kecil."],
+            ["Conquer", "Menyelesaikan tiap submasalah secara rekursif."],
+            ["Combine", "Menggabungkan solusi submasalah menjadi solusi utuh."],
+          ],
+          rumus: [
+            "T(n) = S(n) untuk n ≤ n_[kecil]; T(n) = D(n) + Σ T(n_[i]) + C(n) untuk n &gt; n_[kecil]",
+            "Bentuk Master versi dosen: T(n) = aT({n|b}) + Θ(n^[k]).<br>a &gt; b^[k] ⇒ Θ(n^[log_[b]a]); a = b^[k] ⇒ Θ(n^[k] log n); a &lt; b^[k] ⇒ Θ(n^[k])",
+            "Strassen: 7 perkalian submatriks; P_[1] = (A_[11]+A_[22])(B_[11]+B_[22]), …, C_[11] = P_[1]+P_[4]−P_[5]+P_[7]",
+          ],
+          intuisi:
+            "Masalah besar sering murah dipecah dan digabung. Pada merge sort, tiap level menggabungkan total n elemen, dan ada log₂n level, sehingga total n log n. Karatsuba dan Strassen menghemat satu perkalian rekursif dengan menambah beberapa penjumlahan yang murah.",
+          contoh: [
+            [
+              "Merge sort",
+              "Bagi 2 (a=2, b=2), gabung linear (k=1). a = 2 = 2¹ = b^[k] ⇒ Θ(n log n). Untuk n = 8: 3 level penggabungan × 8 elemen = 24 ≈ n log₂n.",
+            ],
+            [
+              "Binary search dan maks-min",
+              "Binary search: a=1, b=2, k=0; 1 = 2⁰ ⇒ Θ(log n). Maks-min: a=2, b=2, k=0; 2 &gt; 2⁰ = 1 ⇒ Θ(n^[log_[2]2]) = Θ(n).",
+            ],
+            [
+              "Perkalian bilangan dan matriks",
+              "D&amp;C biasa: 4T({n|2})+Θ(n): 4 &gt; 2 ⇒ Θ(n²) (tidak ada keuntungan). Karatsuba: 3T({n|2})+Θ(n) ⇒ Θ(n^[log_[2]3]) ≈ n^[1,585]. Matriks biasa 8T({n|2})+Θ(n²): 8 &gt; 4 ⇒ Θ(n³). Strassen: 7T({n|2})+Θ(n²): 7 &gt; 4 ⇒ Θ(n^[log_[2]7]) ≈ n^[2,807].",
+            ],
+          ],
+          pseudo:
+            "Solution(I)\n  if size(I) <= kecil: return Direct(I)\n  bagi I menjadi I1..Ik\n  Si ← Solution(Ii) untuk tiap i\n  return Combine(S1..Sk)",
+          cara: "Tentukan a (jumlah submasalah yang <i>diproses</i>), b (faktor pengecil ukuran), dan k (biaya divide+combine Θ(n^[k])). Bandingkan a dengan b^[k]. Di binary search dua sisi ada, tetapi hanya satu yang diproses, jadi a = 1.",
+          salah: [
+            "Menghitung a = 2 untuk binary search.",
+            "Menganggap D&amp;C otomatis lebih cepat; perkalian D&amp;C biasa tetap Θ(n²).",
+            "Slide Materi 5 memakai O pada hasil Master; hasil yang tepat Θ.",
+          ],
+          ringkas:
+            "D&amp;C = bagi, selesaikan, gabung. Analisisnya lewat rekurensi: binary search Θ(log n), merge sort Θ(n log n), Karatsuba Θ(n^[1,585]), Strassen Θ(n^[2,807]).",
+        },
+        {
+          n: 6,
+          t: "Greedy: Seleksi Aktivitas dan Huffman",
+          tujuan:
+            "Memahami pilihan greedy, menyelesaikan seleksi aktivitas, dan membangun kode Huffman.",
+          istilah: [
+            [
+              "Greedy",
+              "Pada tiap langkah memilih yang terbaik saat itu (optimal lokal) tanpa menyelesaikan seluruh submasalah, seperti DP.",
+            ],
+            [
+              "Greedy-choice property",
+              "Ada solusi optimal yang memuat pilihan greedy tersebut.",
+            ],
+            [
+              "Substruktur optimal",
+              "Solusi optimal masalah memuat solusi optimal submasalahnya (dimiliki juga oleh DP).",
+            ],
+            [
+              "Aktivitas kompatibel",
+              "Dua interval yang tidak saling overlap (s_[j] ≥ f_[i]).",
+            ],
+            [
+              "Prefix code",
+              "Tak ada kode yang menjadi awalan kode lain, jadi hasil bisa didekode tanpa ambigu.",
+            ],
+          ],
+          rumus: [
+            "Seleksi aktivitas: urutkan menurut f_[i]; pilih a_[1]; lanjut ke aktivitas pertama dengan s ≥ f terakhir terpilih.",
+            "Bit total Huffman: B(T) = Σ c.freq · d_[T](c)",
+            "Pohon Huffman: |C| daun, |C|−1 simpul dalam.",
+          ],
+          intuisi:
+            "Aktivitas dengan finish tercepat menyisakan ruang waktu terbanyak. <b>Bukti (exchange):</b> ambil solusi optimal, tukar aktivitas pertamanya dengan a₁ (finish tercepat). Karena f₁ ≤ f dari yang ditukar, tidak ada overlap baru dan jumlahnya tetap, jadi ada optimal yang memuat a₁. Pada Huffman, karakter langka diberi kode panjang dan yang sering diberi kode pendek.",
+          contoh: [
+            [
+              "Seleksi aktivitas: a1(1,3) a2(0,4) a3(1,2) a4(4,6) a5(2,9) a6(5,8) a7(3,5) a8(4,5)",
+              "Urut finish: a3(2), a1(3), a2(4), a7(5), a8(5), a4(6), a6(8), a5(9). Pilih a3 (f=2). Berikutnya s ≥ 2: a1 s=1 ✗, a2 s=0 ✗, a7 s=3 ✓ (f=5). Berikutnya s ≥ 5: a8 s=4 ✗, a4 s=4 ✗, a6 s=5 ✓ (f=8). a5 s=2 ✗. Hasil {a3, a7, a6}: 3 aktivitas, semua kompatibel dan maksimum.",
+            ],
+            [
+              "Huffman a:45 b:13 c:12 d:16 e:9 f:5 (ribuan)",
+              "Gabung f+e = 14; c+b = 25; 14+d = 30; 25+30 = 55; a+55 = 100. Kode: a=0, b=101, c=100, d=111, e=1101, f=1100 (prefix-free). Bit = 45·1+13·3+12·3+16·3+9·4+5·4 = 45+39+36+48+36+20 = 224 ribu; tetap 3 bit ⇒ 300 ribu.",
+            ],
+          ],
+          pseudo:
+            "A ← {a1}; k ← 1\nfor m ← 2 to n do\n  if s[m] >= f[k] then A ← A ∪ {am}; k ← m",
+          cara: "Seleksi aktivitas: jika sudah terurut, satu kali telusur ⇒ Θ(n). Jika belum, tambah biaya sort O(n log n). Huffman: build min-heap O(n) + (n−1) iterasi × O(log n) ⇒ O(n log n).",
+          salah: [
+            "Memilih durasi terkecil: (1,5), (4,6), (5,9). Durasi terkecil (4,6) hanya memberi 1, padahal (1,5)+(5,9) memberi 2.",
+            "Menganggap greedy selalu tidak optimal. Untuk seleksi aktivitas dan Huffman, greedy terbukti optimal (slide menyebut greedy heuristik secara umum).",
+            "Mencampur kode yang memakai awalan yang sama.",
+          ],
+          ringkas:
+            "Greedy memilih terbaik saat itu. Pada seleksi aktivitas dan Huffman pilihan itu terbukti optimal. Waktunya Θ(n) untuk seleksi (data terurut) dan O(n log n) untuk Huffman.",
+        },
+      ];
+      // ---- SVG: pohon Huffman contoh dosen
+      const HN = [
+          [200, 20, "100"],
+          [100, 70, "a:45"],
+          [300, 70, "55"],
+          [240, 120, "25"],
+          [360, 120, "30"],
+          [200, 170, "c:12"],
+          [280, 170, "b:13"],
+          [330, 170, "14"],
+          [400, 170, "d:16"],
+          [305, 220, "f:5"],
+          [355, 220, "e:9"],
+        ],
+        HE = [
+          [0, 1, 0],
+          [0, 2, 1],
+          [2, 3, 0],
+          [2, 4, 1],
+          [3, 5, 0],
+          [3, 6, 1],
+          [4, 7, 0],
+          [4, 8, 1],
+          [7, 9, 0],
+          [7, 10, 1],
+        ];
+      const HUF =
+        '<div class="w"><svg viewBox="0 0 440 245" width="440" role="img" aria-label="Pohon Huffman: a=0, c=100, b=101, f=1100, e=1101, d=111" font-size="12" text-anchor="middle" fill="currentColor">' +
+        HE.map((e) => {
+          const p = HN[e[0]],
+            c = HN[e[1]];
+          return `<line x1="${p[0]}" y1="${p[1]}" x2="${c[0]}" y2="${
+            c[1]
+          }" stroke="currentColor"/><text x="${
+            (p[0] + c[0]) / 2 + (e[2] ? 8 : -8)
+          }" y="${(p[1] + c[1]) / 2}" fill="#d4a017">${e[2]}</text>`;
+        }).join("") +
+        HN.map(
+          (n) =>
+            `<rect x="${n[0] - 19}" y="${
+              n[1] - 11
+            }" width="38" height="22" rx="5" fill="var(--card)" stroke="currentColor"/><text x="${
+              n[0]
+            }" y="${n[1] + 4}">${n[2]}</text>`
+        ).join("") +
+        '</svg><p class="tag">Pohon Huffman contoh dosen (kiri = 0, kanan = 1): a=0, c=100, b=101, f=1100, e=1101, d=111.</p></div>';
+      function cs() {
+        let h = `<h2 style="border:0">Bagian 2 — Cheatsheet</h2><div class="w"><table><tr><th>Kelas</th><th>Nama</th><th>Contoh</th></tr><tr><td>O(1)</td><td>Konstan</td><td>Tukar dua nilai</td></tr><tr><td>O(log n)</td><td>Logaritmik</td><td>Binary search</td></tr><tr><td>O(n)</td><td>Linear</td><td>Linear search</td></tr><tr><td>O(n log n)</td><td>n log n</td><td>Merge sort</td></tr><tr><td>O(n²)</td><td>Kuadratik</td><td>Loop bersarang</td></tr><tr><td>O(mⁿ) / O(n!)</td><td>Eksponensial / faktorial</td><td>Fib rekursif naif</td></tr></table></div>`;
+        for (const p of P) {
+          h +=
+            `<section id="p${p.n}"><h2>Pertemuan ${p.n}: ${p.t}</h2>` +
+            B("note", "Tujuan belajar", p.tujuan) +
+            B(
+              "def",
+              "Istilah dan definisi",
+              p.istilah.map((x) => `<b>${x[0]}</b>: ${x[1]}`).join("<br>")
+            ) +
+            B(
+              "rum",
+              "Rumus",
+              p.rumus.map((x) => `<div class="m">${x}</div>`).join("<hr>")
+            ) +
+            B("note", "Mengapa bekerja", p.intuisi) +
+            p.contoh
+              .map((c, i) => B("ex", "Contoh " + (i + 1) + ": " + c[0], c[1]))
+              .join("") +
+            (p.pseudo ? `<pre>${p.pseudo}</pre>` : "") +
+            (p.n == 6 ? HUF : "") +
+            B("note", "Cara menentukan kompleksitas", p.cara) +
+            B("warn", "Kesalahan umum", "• " + p.salah.join("<br>• ")) +
+            B("def", "Ringkasan", p.ringkas) +
+            "</section>";
+        }
+        document.getElementById("cs").innerHTML = h;
+      }
+      // ---- soal
+      const MC = [
+        [
+          1,
+          1,
+          "Untuk n cukup besar, mana yang benar tentang insertion sort (c₁n²) dan merge sort (c₂ n lg n)?",
+          [
+            "Insertion sort selalu lebih cepat karena c₁ kecil",
+            "Merge sort akhirnya lebih cepat berapa pun nilai c₁ dan c₂",
+            "Keduanya selalu sama cepat",
+            "Bergantung mesin saja, tidak bisa dibandingkan",
+          ],
+          1,
+          "n² tumbuh lebih cepat dari n lg n, sehingga ada titik n di mana merge sort menang meski konstantanya lebih besar.",
+        ],
+        [
+          1,
+          2,
+          "Dua langkah induksi matematika adalah…",
+          [
+            "Uji beberapa nilai n, lalu simpulkan",
+            "Buktikan base case, lalu buktikan P(k) ⇒ P(k+1)",
+            "Buktikan P(k+1) tanpa asumsi apa pun",
+            "Buktikan P(n) untuk n terbesar",
+          ],
+          1,
+          "Induksi = base case + langkah induksi (anggap P(k) benar, tunjukkan P(k+1)).",
+        ],
+        [
+          2,
+          1,
+          "Pencarian nilai maksimum pada larik n elemen membutuhkan berapa perbandingan?",
+          ["n", "n − 1", "n²", "log n"],
+          1,
+          "Mulai dari a₁ sebagai maks; a₂..aₙ dibandingkan sekali: n − 1.",
+        ],
+        [
+          2,
+          2,
+          "Sequential search, x ada dan tiap posisi sama mungkin. T_avg(n) = …",
+          ["n", "1", "(n+1)/2", "n/2 + 1"],
+          2,
+          "(1+2+…+n)/n = n(n+1)/(2n) = (n+1)/2.",
+        ],
+        [
+          3,
+          1,
+          "T(n) = 2n² + 6n + 1. Big-O yang tepat:",
+          ["O(n)", "O(n²)", "O(n³) saja", "O(2n²+6n)"],
+          1,
+          "Suku dominan n², koefisien dibuang: O(n²). (O(n³) juga benar sebagai batas atas longgar, tetapi bukan yang paling ketat.)",
+        ],
+        [
+          3,
+          2,
+          "Pernyataan mana yang tepat?",
+          [
+            "Big-O selalu berarti worst case",
+            "Θ(f) berarti O(f) dan Ω(f)",
+            "Ω adalah batas atas",
+            "O(2n) berbeda dari O(n)",
+          ],
+          1,
+          "Θ = batas atas dan bawah sekaligus. Big-O adalah batas atas fungsi, bukan otomatis worst case; konstanta dibuang.",
+        ],
+        [
+          3,
+          3,
+          "Larik sudah terurut; untuk satu kali pencarian nilai x, mana yang tercepat?",
+          [
+            "Linear search O(n)",
+            "Binary search O(log n)",
+            "Urutkan dulu lalu binary search",
+            "Merge sort",
+          ],
+          1,
+          "Karena sudah terurut, binary search O(log n) tanpa biaya mengurutkan. Bila belum terurut, mengurutkan (O(n log n)) tidak sepadan untuk satu pencarian.",
+        ],
+        [
+          4,
+          1,
+          "T(1)=0, T(n)=T(n−1)+1 menghasilkan…",
+          ["Θ(log n)", "Θ(n)", "Θ(n²)", "Θ(2ⁿ)"],
+          1,
+          "T(n) = T(n−i)+i, i = n−1 ⇒ T(n) = n − 1 = Θ(n).",
+        ],
+        [
+          4,
+          2,
+          "Master theorem TIDAK dapat dipakai langsung pada…",
+          [
+            "T(n)=2T(n/2)+n",
+            "T(n)=T(n−1)+1",
+            "T(n)=4T(n/2)+n²",
+            "T(n)=T(n/2)+1",
+          ],
+          1,
+          "Ukuran mengecil dengan pengurangan (n−1), bukan pembagian n/b.",
+        ],
+        [
+          4,
+          3,
+          "T(n)=4T(n/2)+n². Hasilnya:",
+          ["Θ(n²)", "Θ(n² log n)", "Θ(n³)", "Θ(n log n)"],
+          1,
+          "a=4,b=2, log₂4=2, f=Θ(n²): kasus 2 ⇒ Θ(n² log n).",
+        ],
+        [
+          5,
+          1,
+          "Pada binary search sebagai D&C, nilai a, b, k adalah…",
+          ["a=2,b=2,k=0", "a=1,b=2,k=0", "a=1,b=2,k=1", "a=2,b=2,k=1"],
+          1,
+          "Dua sisi ada, tetapi hanya satu yang diproses: a=1. Hasil: a = 2⁰ ⇒ Θ(log n).",
+        ],
+        [
+          5,
+          2,
+          "Karatsuba menghasilkan kompleksitas…",
+          ["Θ(n²)", "Θ(n^{log₂3}) ≈ n^1,585", "Θ(n log n)", "Θ(n³)"],
+          1,
+          "T(n)=3T(n/2)+Θ(n); a=3 > 2 ⇒ Θ(n^{log₂3}).",
+        ],
+        [
+          6,
+          1,
+          "Aturan greedy yang benar pada seleksi aktivitas:",
+          [
+            "Pilih durasi terpendek",
+            "Pilih waktu mulai terawal",
+            "Pilih waktu selesai tercepat yang kompatibel",
+            "Pilih yang paling sedikit overlap",
+          ],
+          2,
+          "Finish tercepat menyisakan waktu terbanyak dan terbukti optimal lewat exchange argument.",
+        ],
+        [
+          6,
+          2,
+          "Ciri prefix code pada Huffman:",
+          [
+            "Semua kode sama panjang",
+            "Tak ada kode yang menjadi awalan kode lain",
+            "Kode terpendek untuk karakter langka",
+            "Selalu 3 bit",
+          ],
+          1,
+          "Karena karakter hanya pada daun, tak ada kode yang awalan kode lain; kode bisa didekode tanpa ambigu.",
+        ],
+        [
+          6,
+          3,
+          "Kompleksitas algoritma Huffman dengan min-heap untuk n karakter:",
+          ["Θ(n)", "O(n log n)", "O(n²)", "O(log n)"],
+          1,
+          "Build heap O(n) + (n−1) iterasi × O(log n) = O(n log n).",
+        ],
+      ];
+      const HC = [
+        [
+          1,
+          "Algoritma A berjalan 100n², B berjalan 2ⁿ. Berapa n terkecil agar A lebih cepat dari B?",
+          "Uji: n=14: 100·196 = 19.600 vs 2¹⁴ = 16.384 ⇒ A belum. n=15: 100·225 = 22.500 vs 2¹⁵ = 32.768 ⇒ A lebih cepat. Jawaban: n = 15 (dan seterusnya A tetap lebih cepat).",
+        ],
+        [
+          1,
+          "Insertion sort 8n² langkah, merge sort 64 n lg n. Untuk n berapa insertion sort lebih cepat?",
+          "8n² &lt; 64 n lg n ⇔ n &lt; 8 lg n. n=43: 8·5,426 = 43,4 &gt; 43 ✓. n=44: 8·5,459 = 43,7 &lt; 44 ✗. n=2: 8·1 = 8 &lt; 16? Cek langsung 8·4 = 32 &lt; 64·2·1 = 128 ✓. n=1: 8 vs 0 ✗. Jawaban: 2 ≤ n ≤ 43.",
+        ],
+        [
+          2,
+          "Sequential search n=10. Berapa perbandingan best, worst, dan rata-rata (posisi seragam)?",
+          "Best 1, worst 10, avg (10+1)/2 = 5,5.",
+        ],
+        [
+          3,
+          "Hitung jumlah eksekusi a←a+1 pada: for i=1..n, for j=1..i. Untuk n=10 dan bentuk umum.",
+          "Total = 1+2+…+10 = 55 = 10·11/2. Umum: n(n+1)/2 = n²/2 + n/2 ⇒ Θ(n²).",
+        ],
+        [
+          4,
+          "Selesaikan A(n) = 2A(n−1) + 1, A(1) = 0 dengan backward substitution (penjumlahan pada 2ⁿ = 2ⁿ⁻¹ + 2ⁿ⁻¹). Hitung A(4).",
+          "A(n)=2A(n−1)+1 = 4A(n−2)+3 = 8A(n−3)+7 = … = 2^i·A(n−i)+2^i−1. Base saat i=n−1: A(n)=2^(n−1)−1 = Θ(2ⁿ). A(4)=7. Eksponensial, tidak efisien; jumlah pemanggilan untuk n=4 adalah 15.",
+        ],
+        [
+          5,
+          "T(n) = 8T(n/2) + n² dan T(n) = 2T(n/2) + 10n. Tentukan Θ tiap-tiapnya dengan Master.",
+          "(1) a=8,b=2, log₂8=3, f=n²=O(n^(3−ε)) ⇒ kasus 1 ⇒ Θ(n³). (2) a=2,b=2, log₂2=1, f=10n=Θ(n) ⇒ kasus 2 ⇒ Θ(n log n).",
+        ],
+        [
+          6,
+          "Seleksi aktivitas: a1(1,3) a2(0,4) a3(1,2) a4(4,6) a5(2,9) a6(5,8) a7(3,5) a8(4,5). Tentukan himpunan maksimum.",
+          "Urut finish, pilih greedy: a3(f=2) → a7 (s=3≥2, f=5) → a6 (s=5≥5, f=8). Hasil {a3, a7, a6}, 3 aktivitas, tidak ada overlap; a8/a4 mulai di 4 &lt; 5 sehingga tak bisa dipilih.",
+        ],
+        [
+          6,
+          "Huffman: A35 B10 C20 D20 E15. Bangun kode, encode ABCABAD, decode 10001011100101, hitung total bit.",
+          "Gabung: B+E=25; C+D=40; 25+A=60; 40+60=100. Dengan konvensi kiri=0 (kecil/awal di kiri): C=00, D=01, B=100, E=101, A=11 (prefix-free). Encode ABCABAD = 11·100·00·11·100·11·01 = 1110000111001101 (16 bit). Decode: 100|01|01|11|00|101 = BDDACE. Total bit = 35·2+10·3+20·2+20·2+15·3 = 70+30+40+40+45 = 225 (bandingkan tetap 3 bit = 300). Catatan: kode berbeda bila tie/konvensi berbeda, tetapi total bit tetap 225.",
+        ],
+      ];
+      const ES = [
+        [
+          1,
+          "Buktikan dengan induksi: 1 + 3 + 5 + … + (2n−1) = n².",
+          "Base n=1: 1 = 1² ✓. Anggap benar untuk k: Σ = k². Untuk k+1 tambahkan suku ke-(k+1) yaitu 2(k+1)−1 = 2k+1: k² + 2k + 1 = (k+1)² ✓. Terbukti untuk semua n ≥ 1.",
+        ],
+        [
+          5,
+          "Mengapa Karatsuba lebih cepat daripada perkalian bilangan D&C biasa? Tuliskan rekurensi dan hasil keduanya.",
+          "Biasa: 4 perkalian n/2-digit + penjumlahan geser Θ(n): T=4T(n/2)+Θ(n), a=4 &gt; b^k=2 ⇒ Θ(n²). Karatsuba mengganti satu perkalian dengan pengurangan/penjumlahan (yang murah): T=3T(n/2)+Θ(n), a=3 &gt; 2 ⇒ Θ(n^(log₂3)) ≈ n^1,585. Hemat satu panggilan rekursif per level.",
+        ],
+        [
+          6,
+          "Buktikan pilihan greedy (aktivitas dengan finish tercepat) menghasilkan solusi optimal pada seleksi aktivitas. Beri juga contoh yang menunjukkan durasi terkecil tidak optimal.",
+          "Misal A optimal, aktivitas pertamanya ak, dan a₁ punya f₁ ≤ fk. Ganti ak dengan a₁: a₁ selesai tak lebih lambat dari ak sehingga tidak overlap dengan aktivitas lain di A. Jumlah sama ⇒ ada optimal yang memuat a₁. Lalu submasalah sisa (aktivitas dengan s ≥ f₁) diselesaikan dengan argumen yang sama (induksi). Untuk durasi terkecil: (1,5), (4,6), (5,9). Durasi terkecil (4,6) menyisakan 1 aktivitas; optimal (1,5)+(5,9) = 2.",
+        ],
+      ];
+      let S = {};
+      try {
+        S = JSON.parse(localStorage.getItem("kompl") || "{}");
+      } catch (e) {}
+      const sv = () => {
+        try {
+          localStorage.setItem("kompl", JSON.stringify(S));
+        } catch (e) {}
+      };
+      let F = 0;
+      const L = "ABCD";
+      function qs() {
+        let h = "",
+          t = 0,
+          ok = 0,
+          dn = 0,
+          tot = 0;
+        MC.forEach((q, i) => {
+          if (F && q[0] != F) return;
+          const id = "m" + i,
+            s = S[id] || {};
+          tot++;
+          h +=
+            `<div class="q ${
+              s.c ? "done" : ""
+            }"><span class="tag">MC · Pertemuan ${q[0]} · ${
+              ["", "Dasar", "Menengah", "Menantang"][q[1]] || "Dasar"
+            }</span><div>${i + 1}. ${q[2]}</div>` +
+            q[3]
+              .map(
+                (o, j) =>
+                  `<label><input type="radio" name="${id}" ${
+                    s.s === j ? "checked" : ""
+                  } ${s.c ? "disabled" : ""} onchange="pick('${id}',${j})"> ${
+                    L[j]
+                  }. ${M(o)}</label>`
+              )
+              .join("") +
+            `<button ${s.c ? "disabled" : ""} onclick="chk('${id}',${
+              q[4]
+            })">Periksa</button> <button onclick="rst('${id}')">Ulangi</button>` +
+            (s.c
+              ? `<div class="res"><span class="${
+                  s.s === q[4] ? "good" : "bad"
+                }">${
+                  s.s === q[4] ? "Benar" : "Salah — jawaban: " + L[q[4]]
+                }</span>. ${M(q[5])}</div>`
+              : "") +
+            "</div>";
+          if (s.c) {
+            dn++;
+            if (s.s === q[4]) ok++;
+          }
+        });
+        HC.forEach((q, i) => {
+          if (F && q[0] != F) return;
+          const id = "h" + i;
+          tot++;
+          const s = S[id] || {};
+          if (s.o) dn++;
+          h += sol(id, "Hitungan", q);
+        });
+        ES.forEach((q, i) => {
+          if (F && q[0] != F) return;
+          const id = "e" + i;
+          tot++;
+          const s = S[id] || {};
+          if (s.o) dn++;
+          h += sol(id, "Uraian", q);
+        });
+        document.getElementById("qs").innerHTML = h;
+        document.getElementById(
+          "score"
+        ).textContent = `Dikerjakan ${dn}/${tot} · Skor pilihan ganda: ${ok}/${
+          MC.filter((q) => !F || q[0] == F).length
+        }`;
+      }
+      function sol(id, l, q) {
+        const s = S[id] || {};
+        return `<div class="q ${
+          s.o ? "done" : ""
+        }"><span class="tag">${l} · Pertemuan ${q[0]}</span><div>${M(
+          q[1]
+        )}</div><button onclick="tg('${id}')">Lihat pembahasan</button><div class="sol ${
+          s.o ? "show" : ""
+        }" id="s${id}">${M(q[2])}</div></div>`;
+      }
+      function pick(id, j) {
+        S[id] = Object.assign(S[id] || {}, { s: j });
+        sv();
+      }
+      function chk(id, a) {
+        const s = S[id] || {};
+        if (s.s == null) {
+          alert("Pilih jawaban dulu.");
+          return;
+        }
+        s.c = 1;
+        S[id] = s;
+        sv();
+        qs();
+      }
+      function rst(id) {
+        delete S[id];
+        sv();
+        qs();
+      }
+      function tg(id) {
+        S[id] = Object.assign(S[id] || {}, { o: 1 });
+        sv();
+        document.getElementById("s" + id).classList.toggle("show");
+        qs();
+        document.getElementById("s" + id).classList.add("show");
+      }
+      document.getElementById("flt").innerHTML = ["Semua", 1, 2, 3, 4, 5, 6]
+        .map(
+          (x, i) =>
+            `<button class="chip ${
+              i == 0 ? "on" : ""
+            }" onclick="F=${i};[...this.parentNode.children].forEach(b=>b.classList.remove('on'));this.classList.add('on');qs()">${x}</button>`
+        )
+        .join(" ");
+      cs();
+      qs();
+    </script>
+    <!-- TEMPEL di file HTML lu, tepat SEBELUM </body> (setelah </script> yang lama). Ini pengganti snippet pertama. -->
+    <style>
+      body {
+        font-size: 18px;
+        line-height: 1.95;
+      }
+      @media (max-width: 600px) {
+        body {
+          font-size: 17px;
+        }
+      }
+      #cs {
+        display: none;
+      }
+      .slide {
+        display: none;
+        max-width: 820px;
+        margin: auto;
+        padding: 0 20px 110px;
+      }
+      .slide header {
+        padding: 0;
+      }
+      .slide .pt {
+        margin: 22px 0 0;
+        font-size: 0.9rem;
+      }
+      .slide h1 {
+        font-size: 2rem;
+        line-height: 1.3;
+        margin: 28px 0 10px;
+      }
+      .slide h2 {
+        font-size: 1.6rem;
+        line-height: 1.35;
+        margin: 26px 0 18px;
+        padding-bottom: 8px;
+      }
+      .slide h3 {
+        font-size: 1.15rem;
+        margin: 26px 0 10px;
+      }
+      .slide p {
+        margin: 14px 0;
+      }
+      .box {
+        padding: 18px 22px;
+        margin: 22px 0;
+        border-radius: 10px;
+      }
+      .box b.t {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+        letter-spacing: 0.06em;
+      }
+      .box hr {
+        margin: 18px 0;
+        border: 0;
+        border-top: 1px solid var(--bd);
+      }
+      .gap {
+        display: block;
+        height: 0.75em;
+      }
+      .m {
+        font-size: 1.2em;
+        line-height: 2.3;
+      }
+      .fr {
+        margin: 0 5px;
+      }
+      .fr > span {
+        padding: 0 6px;
+      }
+      pre {
+        font-size: 1rem;
+        line-height: 1.7;
+        padding: 16px 18px;
+        margin: 22px 0;
+      }
+      td,
+      th {
+        padding: 10px 14px;
+      }
+      .map {
+        gap: 10px;
+        margin: 20px 0;
+      }
+      .map span.n {
+        padding: 8px 14px;
+      }
+      #lat {
+        display: none;
+        max-width: 820px;
+        margin: auto;
+        padding: 0 20px 110px;
+      }
+      #lat h2 {
+        margin-top: 22px;
+      }
+      .q {
+        padding: 20px 22px;
+        margin: 18px 0;
+      }
+      .q label {
+        padding: 9px 0;
+      }
+      .q button {
+        margin: 12px 8px 0 0;
+        padding: 8px 16px;
+      }
+      .res,
+      .sol {
+        margin-top: 16px;
+      }
+      #score {
+        position: static;
+        border: 1px solid var(--bd);
+        border-radius: 8px;
+        margin-top: 18px;
+        padding: 12px;
+      }
+      #pn {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--card);
+        border-top: 1px solid var(--bd);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        z-index: 10;
+      }
+      #pn button {
+        padding: 8px 16px;
+      }
+      #pn .pg {
+        min-width: 90px;
+        text-align: center;
+        font-size: 0.95rem;
+      }
+      #pn i {
+        position: absolute;
+        top: -3px;
+        left: 0;
+        height: 3px;
+        background: var(--ac);
+        transition: width 0.2s;
+      }
+      #pn button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      @media print {
+        .slide {
+          display: block !important;
+          padding-bottom: 0;
+        }
+        #pn,
+        #lat {
+          display: none !important;
+        }
+      }
+    </style>
+    <script>
+      (function () {
+        const sl = [],
+          idx = {};
+        function add(els, p) {
+          const d = document.createElement("div");
+          d.className = "slide";
+          if (typeof p == "number" && p in idx) {
+            const t = document.createElement("div");
+            t.className = "tag pt";
+            t.textContent = "Pertemuan " + p + ": " + P[p - 1].t;
+            d.appendChild(t);
+          }
+          els.forEach((e) => {
+            if (e.classList && e.classList.contains("box"))
+              e.innerHTML = e.innerHTML.replace(
+                /<br>/g,
+                '<br><span class="gap"></span>'
+              );
+            d.appendChild(e);
+          });
+          if (!(p in idx)) idx[p] = sl.length;
+          sl.push(d);
+        }
+        const cs = document.getElementById("cs"),
+          lat = document.getElementById("lat");
+        add([document.getElementById("awal")], "awal");
+        add([cs.children[0], cs.children[1]], "tab");
+        [...cs.querySelectorAll("section")].forEach((s, i) => {
+          const k = [...s.children],
+            n = i + 1,
+            ex = k.filter((e) => e.classList.contains("ex")),
+            li = k.indexOf(ex[ex.length - 1]);
+          add([k[0], k[1], k[2]], n);
+          add([k[3], k[4]], n);
+          ex.forEach((e, j) =>
+            add(j == ex.length - 1 ? [e, ...k.slice(li + 1, -3)] : [e], n)
+          );
+          add(k.slice(-3), n);
+        });
+        sl.forEach((d) => lat.before(d));
+        lat.appendChild(document.getElementById("score"));
+
+        const nav = document.getElementById("nav");
+        nav.innerHTML = "";
+        [
+          ["Awal", "awal"],
+          ["Tabel", "tab"],
+          ["P1", 1],
+          ["P2", 2],
+          ["P3", 3],
+          ["P4", 4],
+          ["P5", 5],
+          ["P6", 6],
+          ["Latihan", "lat"],
+        ].forEach(([t, k]) => {
+          const b = document.createElement("button");
+          b.textContent = t;
+          b.onclick = () => go(k == "lat" ? sl.length : idx[k]);
+          nav.appendChild(b);
+        });
+        const pr = document.createElement("button");
+        pr.textContent = "Cetak";
+        pr.onclick = () => print();
+        nav.appendChild(pr);
+
+        const pn = document.createElement("div");
+        pn.id = "pn";
+        pn.innerHTML =
+          '<i></i><button id="pv">◀ Sebelumnya</button><span class="pg" id="pg"></span><button id="nx">Berikutnya ▶</button>';
+        document.body.appendChild(pn);
+        const pv = document.getElementById("pv"),
+          nx = document.getElementById("nx"),
+          pg = document.getElementById("pg");
+
+        let cur = 0;
+        try {
+          cur = +localStorage.getItem("kslide") || 0;
+        } catch (e) {}
+        const tot = () =>
+          sl.length + document.querySelectorAll("#qs .q").length;
+        function show(i) {
+          const n = tot();
+          cur = Math.max(0, Math.min(n - 1, i));
+          sl.forEach((d, j) => (d.style.display = j == cur ? "block" : "none"));
+          const q = cur >= sl.length;
+          lat.style.display = q ? "block" : "none";
+          document
+            .querySelectorAll("#qs .q")
+            .forEach(
+              (e, j) =>
+                (e.style.display = j == cur - sl.length ? "block" : "none")
+            );
+          pg.textContent = cur + 1 + " / " + n;
+          pn.firstChild.style.width = ((cur + 1) / n) * 100 + "%";
+          pv.disabled = cur == 0;
+          nx.disabled = cur == n - 1;
+          try {
+            localStorage.setItem("kslide", cur);
+          } catch (e) {}
+        }
+        window.go = (i) => {
+          show(i);
+          scrollTo(0, 0);
+        };
+        pv.onclick = () => go(cur - 1);
+        nx.onclick = () => go(cur + 1);
+        const oq = qs;
+        qs = function () {
+          oq();
+          show(cur);
+        };
+        addEventListener("keydown", (e) => {
+          if (/INPUT|TEXTAREA/.test(e.target.tagName)) return;
+          if (e.key == "ArrowRight") go(cur + 1);
+          if (e.key == "ArrowLeft") go(cur - 1);
+        });
+        show(cur);
+      })();
+    </script>
+  </body>
+</html>
